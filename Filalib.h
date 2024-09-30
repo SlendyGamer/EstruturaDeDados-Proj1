@@ -1,5 +1,6 @@
 #ifndef FILAS_H_INCLUDED
 #define FILAS_H_INCLUDED
+#define SEED 23698
 
 typedef struct horario
 {
@@ -29,10 +30,57 @@ typedef struct fila
     no *last;
 }fila;
 
+data setHorarioAtual()
+{
+    data horarioAtual;
+    int minutos = rand()%1440;
 
+    horarioAtual.horas = floor(minutos/60);
+    horarioAtual.minutos = minutos % 60;
 
+    return horarioAtual;
+}
 
+void showHorario(data horario)
+{
+    printf(" Horario eh: %02d : %d\n", horario.horas, horario.minutos);
+}
 
+int setPassageiros()
+{
+    int passageiros = 50 + rand() % 151;
+    return passageiros;
+}
+
+data setHoraPrevista(data horaAtual)
+{
+    data horaPrevista;
+    horaPrevista.minutos = (horaAtual.minutos -30 + rand() % 61);
+    horaPrevista.horas = horaAtual.horas;
+
+    if (horaPrevista.minutos >=60)
+    {
+        horaPrevista.horas++;
+        horaPrevista.minutos -= 60;
+        if(horaPrevista.horas > 23)
+        {
+            horaPrevista.dias++;
+            horaPrevista.horas -= 24;
+        }
+    }
+    else if (horaPrevista.minutos < 0)
+    {
+        horaPrevista.horas--;
+        horaPrevista.minutos += 60;
+        if(horaPrevista.horas < 0)
+        {
+            horaPrevista.dias--;
+            horaPrevista.horas += 24;
+        }
+    }
+
+    return horaPrevista;
+}
 
 
 

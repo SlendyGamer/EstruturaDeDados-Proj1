@@ -11,6 +11,27 @@ int IDvalido(char ID[]);
 int main()
 {
     setlocale(LC_ALL,"portuguese");
+
+    srand(SEED);
+    data horarioAtual = setHorarioAtual();
+    data horaPrevista = setHoraPrevista(horarioAtual);
+    showHorario(horarioAtual);
+    data horaPrevista1 = setHoraPrevista(horarioAtual);
+    showHorario(horaPrevista1);
+    data horaPrevista2 = setHoraPrevista(horarioAtual);
+    showHorario(horaPrevista2);
+    data horaPrevista3 = setHoraPrevista(horarioAtual);
+    showHorario(horaPrevista3);
+    data horaPrevista4 = setHoraPrevista(horarioAtual);
+    showHorario(horaPrevista4);
+    data horaPrevista5 = setHoraPrevista(horarioAtual);
+    showHorario(horaPrevista5);
+    data horaPrevista6 = setHoraPrevista(horarioAtual);
+    showHorario(horaPrevista6);
+    data horaPrevista7 = setHoraPrevista(horarioAtual);
+    showHorario(horaPrevista7);
+    data horaPrevista8 = setHoraPrevista(horarioAtual);
+    showHorario(horaPrevista8);
     //fila *comum = fila_criar();
     //fila *emergencia = fila_criar();
     //fila *realizados = fila_criar();
@@ -47,8 +68,12 @@ int main()
                     }
                     fflush(stdin);
                 } while (!IDvalido(ID)); // || procura por id igual nas filas   || fila_duplicata(comum, ID) || fila_duplicata(emergencia, ID)
+                int passageiros = setPassageiros();
 
-                break;
+                if (ID[4] == '!')
+                {
+                   // fila_inserirVoo(emergencia, ID, passageiros, -1)
+                }
             case 2:
                  for (int i=0; i<10; i++)
                     {
