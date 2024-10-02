@@ -1,59 +1,35 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <locale.h>
 #include <ctype.h>
-#include <string.h>
 #include "Filalib.h"
-int IDvalido(char ID[]);
+
+int IDvalido(char ID[]);  //prototipo
 
 
 
 int main()
 {
     setlocale(LC_ALL,"portuguese");
-
     srand(SEED);
-    data horarioAtual = setHorarioAtual();
-    data horaPrevista = setHoraPrevista(horarioAtual);
-    showHorario(horarioAtual);
-    data horaPrevista1 = setHoraPrevista(horarioAtual);
-    showHorario(horaPrevista1);
-    data horaPrevista2 = setHoraPrevista(horarioAtual);
-    showHorario(horaPrevista2);
-    data horaPrevista3 = setHoraPrevista(horarioAtual);
-    showHorario(horaPrevista3);
-    data horaPrevista4 = setHoraPrevista(horarioAtual);
-    showHorario(horaPrevista4);
-    data horaPrevista5 = setHoraPrevista(horarioAtual);
-    showHorario(horaPrevista5);
-    data horaPrevista6 = setHoraPrevista(horarioAtual);
-    showHorario(horaPrevista6);
-    data horaPrevista7 = setHoraPrevista(horarioAtual);
-    showHorario(horaPrevista7);
-    data horaPrevista8 = setHoraPrevista(horarioAtual);
-    showHorario(horaPrevista8);
-    //fila *comum = fila_criar();
-    //fila *emergencia = fila_criar();
-    //fila *realizados = fila_criar();
-    //if (comum == NULL || emergencia == NULL || realizados == NULL)
-    //{
-    //    printf("filas não inicializadas corretamente! abortando programa!");
-    //    exit(0);
-    //}
+
+    int passageiros;
     int sel = 0;
     char ID[6] = {0};
+    data horarioAtual = setHorarioAtual();
+    data horarioPrevisto;
+    fila *comum = fila_criar();
+    fila *emergencia = fila_criar();
+    //fila *realizados = fila_criar();
+    if (comum == NULL || emergencia == NULL /*|| realizados == NULL */)
+    {
+        printf("filas não inicializadas corretamente! abortando programa!");
+        exit(0);
+    }
     do
     {
-        printf("\n\n\t\tTorre de Controle LucI airport");
-        printf("\n\nEscolha uma das opções abaixo:");
-
-        printf("\n\n\t1- Registrar nova requisição de pouso");
-        printf("\n\n\t2- Autorizar próximo avião");
-        printf("\n\n\t3- Observar filas atuais");
-        printf("\n\n\t4- Indicar próximo a pousar");
-        printf("\n\n\t5- Observar pousos já realizados");
-        printf("\n\n\t6- Estimar pousos que ainda serão feitos");
-        printf("\n\nDigite '-1' para sair ");
+        printMenu();
 
         scanf("%d", &sel);
         fflush(stdin);
@@ -68,17 +44,37 @@ int main()
                     }
                     fflush(stdin);
                 } while (!IDvalido(ID)); // || procura por id igual nas filas   || fila_duplicata(comum, ID) || fila_duplicata(emergencia, ID)
-                int passageiros = setPassageiros();
+
+                passageiros = setPassageiros();
+                horarioPrevisto = setHoraPrevista(horarioAtual);
+
+                printf("%d : %d : %d", horarioPrevisto.dias, horarioPrevisto.horas, horarioPrevisto.minutos); //apagar
+                showHorario(horarioPrevisto); //apagar
 
                 if (ID[4] == '!')
                 {
-                   // fila_inserirVoo(emergencia, ID, passageiros, -1)
+                   fila_inserirVoo(emergencia, ID, passageiros, -1);
+                   printf("emergencia");
                 }
+                else
+                {
+                    if (estaAtrasado(horarioAtual, horarioPrevisto))
+                    {
+                    fila_inserirVoo(comum, ID, passageiros, 0);
+                    }
+                    else
+                    {
+                    fila_inserirVoo(comum, ID, passageiros, 1);
+                    }
+                }
+                break;
             case 2:
-                 for (int i=0; i<10; i++)
+                 for (int i=0; i<4; i++)
                     {
                         printf("%c\n", ID[i]);
                     }
+                fila_printAllInfo(comum);
+                fila_printAllInfo(emergencia);
                 break;
             case 3:
                 break;
@@ -96,11 +92,12 @@ int main()
                 system("pause");
         }
     } while (sel != -1);
-    //fila_liberar(comum);
-    //fila_liberar(emergencia);
+    fila_liberar(comum);
+    fila_liberar(emergencia);
     //fila_liberar(realizados);
     return 0;
 }
+
 
 int IDvalido(char ID[])
 {
