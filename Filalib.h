@@ -44,7 +44,7 @@ data setHorarioAtual()
 
 void showHorario(data horario)
 {
-    printf(" Horario eh: %02d : %d\n", horario.horas, horario.minutos);
+    printf("%02d : %02d\n", horario.horas, horario.minutos);
 }
 
 int setPassageiros()
@@ -59,6 +59,38 @@ data setHoraPrevista(data horaAtual)
 
     horaPrevista.dias = 0;
     horaPrevista.minutos = (horaAtual.minutos -30 + rand() % 61);
+    horaPrevista.horas = horaAtual.horas;
+
+    if (horaPrevista.minutos >=60)
+    {
+        horaPrevista.horas++;
+        horaPrevista.minutos -= 60;
+        if(horaPrevista.horas > 23)
+        {
+            horaPrevista.dias++;
+            horaPrevista.horas -= 24;
+        }
+    }
+    else if (horaPrevista.minutos < 0)
+    {
+        horaPrevista.horas--;
+        horaPrevista.minutos += 60;
+        if(horaPrevista.horas < 0)
+        {
+            horaPrevista.dias--;
+            horaPrevista.horas += 24;
+        }
+    }
+
+    return horaPrevista;
+}
+
+data addHora(data horaAtual, int minutos)
+{
+    data horaPrevista;
+
+    horaPrevista.dias = 0;
+    horaPrevista.minutos = (horaAtual.minutos + minutos);
     horaPrevista.horas = horaAtual.horas;
 
     if (horaPrevista.minutos >=60)
@@ -102,9 +134,7 @@ int estaAtrasado(data horaAtual, data horaPrevista)
 
 void printMenu()
 {
-        printf("\n\n\t\tTorre de Controle LucI airport"
-
-        "\n\nEscolha uma das opções abaixo:"
+        printf("\n\nEscolha uma das opções abaixo:"
 
                "\n\n\t1- Registrar nova requisição de pouso"
 
@@ -241,7 +271,7 @@ void fila_printAllInfo(fila *f)
         printf("ID:\t%.*s\n", 4, pos->info.ID);
         printf("Num pass:\t%d\n", pos->info.passageiros);
         printf("Status:\t %d\n", pos->info.status);
-        printf("hora prevista:\t%d\n", pos->info.hora_prevista);
+        printf("hora prevista:\t%d : %d\n", pos->info.hora_prevista.horas, pos->info.hora_prevista.minutos);
     }
     printf("\n\n");
 }
@@ -255,7 +285,7 @@ void fila_printNextInfo(fila *f)
         printf("ID:\t%.*s\n", 4, pos->info.ID);
         printf("Num pass:\t%d\n", pos->info.passageiros);
         printf("Status:\t %d\n", pos->info.status);
-        printf("hora prevista:\t%d\n", pos->info.hora_prevista);
+        printf("hora prevista:\t%d : %d\n", pos->info.hora_prevista.horas, pos->info.hora_prevista.minutos);
     }
 }
 

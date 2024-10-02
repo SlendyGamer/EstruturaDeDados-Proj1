@@ -17,6 +17,7 @@ int main()
     int passageiros;
     int sel = 0;
     char ID[6] = {0};
+    char whichFila;
     data horarioAtual = setHorarioAtual();
     voo novoVoo;
     //data horarioPrevisto;       //ao inves disso tudo, criar um struct voo
@@ -30,8 +31,10 @@ int main()
     }
     do
     {
+        printf("\n\n\t\tTorre de Controle LucI airport\n\n");
+        printf("\thorario atual: ");
+        showHorario(horarioAtual);
         printMenu();
-
         scanf("%d", &sel);
         fflush(stdin);
         switch(sel)
@@ -39,6 +42,7 @@ int main()
             case 1:
                 do
                 {
+                    printf("\ninsira codigo alfanumerico do voo (4 caracteres) e insira '!' no fim se for emergencial: ");
                     for (int i=0; i<5; i++)
                     {
                         ID[i] = getchar();
@@ -46,12 +50,14 @@ int main()
                     fflush(stdin);
                 } while (!IDvalido(ID)); // || procura por id igual nas filas   || fila_duplicata(comum, ID) || fila_duplicata(emergencia, ID)
 
+                strcpy(novoVoo.ID, ID);
                 novoVoo.passageiros = setPassageiros();
                 novoVoo.hora_prevista = setHoraPrevista(horarioAtual);
-                strcpy(novoVoo.ID, ID);
-
-                printf("%d : %d : %d", novoVoo.hora_prevista.dias, novoVoo.hora_prevista.horas, novoVoo.hora_prevista.minutos); //apagar
-                showHorario(novoVoo.hora_prevista); //apagar
+                printf("voo %.*s\n"
+                       "passageiros: %d\n"
+                       "hora_prevista: ", 4, novoVoo.ID, novoVoo.passageiros);
+                       showHorario(novoVoo.hora_prevista);
+                printf("status: ");
 
                 if (ID[4] == '!')
                 {
@@ -65,11 +71,13 @@ int main()
                     {
                         novoVoo.status = 0;
                         fila_inserirVoo(comum, novoVoo);
+                        printf("no horario");
                     }
                     else
                     {
                         novoVoo.status = 1;
                         fila_inserirVoo(comum, novoVoo);
+                        printf("atrasado");
                     }
                 }
                 break;
@@ -84,20 +92,50 @@ int main()
                     fila_printNextInfo(comum);
                     fila_inserirVoo(realizados, fila_retirarVoo(comum));
                 }
-
+                horarioAtual = addHora(horarioAtual, 10);
                 break;
             case 3:
-                 for (int i=0; i<4; i++)
-                    {
-                        printf("%c\n", ID[i]);
-                    }
-                fila_printAllInfo(comum);
-                fila_printAllInfo(emergencia);
-                fila_printAllInfo(realizados);
+
+                do
+                {
+                scanf("%c", &whichFila);
+                whichFila = toupper(whichFila);
+                } while(whichFila != 'C' && whichFila != 'E');
+                switch(whichFila)
+                {
+                case 'C':
+                    fila_printAllInfo(comum);
+                    break;
+                case 'E':
+                    fila_printAllInfo(emergencia);
+                    break;
+                default:
+                    break;
+                }
                 break;
             case 4:
+                if (!fila_vazia(emergencia))
+                {
+                    fila_printNextInfo(emergencia);
+                }
+                else if (!fila_vazia(comum))
+                {
+                    fila_printNextInfo(comum);
+                }
+                else
+                {
+                    printf("todas as filas estão vazias!\n");
+                }
                 break;
             case 5:
+                if (!fila_vazia(realizados))
+                {
+                    fila_printAllInfo(realizados);
+                }
+                else
+                {
+                    printf("nenhum pouso ocorreu");
+                }
                 break;
             case 6:
                 break;
