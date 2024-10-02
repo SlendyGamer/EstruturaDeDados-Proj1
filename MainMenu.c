@@ -18,10 +18,11 @@ int main()
     int sel = 0;
     char ID[6] = {0};
     data horarioAtual = setHorarioAtual();
-    data horarioPrevisto;
+    voo novoVoo;
+    //data horarioPrevisto;       //ao inves disso tudo, criar um struct voo
     fila *comum = fila_criar();
     fila *emergencia = fila_criar();
-    //fila *realizados = fila_criar();
+    fila *realizados = fila_criar();
     if (comum == NULL || emergencia == NULL /*|| realizados == NULL */)
     {
         printf("filas não inicializadas corretamente! abortando programa!");
@@ -45,38 +46,54 @@ int main()
                     fflush(stdin);
                 } while (!IDvalido(ID)); // || procura por id igual nas filas   || fila_duplicata(comum, ID) || fila_duplicata(emergencia, ID)
 
-                passageiros = setPassageiros();
-                horarioPrevisto = setHoraPrevista(horarioAtual);
+                novoVoo.passageiros = setPassageiros();
+                novoVoo.hora_prevista = setHoraPrevista(horarioAtual);
+                strcpy(novoVoo.ID, ID);
 
-                printf("%d : %d : %d", horarioPrevisto.dias, horarioPrevisto.horas, horarioPrevisto.minutos); //apagar
-                showHorario(horarioPrevisto); //apagar
+                printf("%d : %d : %d", novoVoo.hora_prevista.dias, novoVoo.hora_prevista.horas, novoVoo.hora_prevista.minutos); //apagar
+                showHorario(novoVoo.hora_prevista); //apagar
 
                 if (ID[4] == '!')
                 {
-                   fila_inserirVoo(emergencia, ID, passageiros, -1);
+                   novoVoo.status = -1;
+                   fila_inserirVoo(emergencia, novoVoo);
                    printf("emergencia");
                 }
                 else
                 {
-                    if (estaAtrasado(horarioAtual, horarioPrevisto))
+                    if (estaAtrasado(horarioAtual, novoVoo.hora_prevista))
                     {
-                    fila_inserirVoo(comum, ID, passageiros, 0);
+                        novoVoo.status = 0;
+                        fila_inserirVoo(comum, novoVoo);
                     }
                     else
                     {
-                    fila_inserirVoo(comum, ID, passageiros, 1);
+                        novoVoo.status = 1;
+                        fila_inserirVoo(comum, novoVoo);
                     }
                 }
                 break;
             case 2:
+                if (!fila_vazia(emergencia))
+                {
+                    fila_printNextInfo(emergencia);
+                    fila_inserirVoo(realizados, fila_retirarVoo(emergencia));
+                }
+                else
+                {
+                    fila_printNextInfo(comum);
+                    fila_inserirVoo(realizados, fila_retirarVoo(comum));
+                }
+
+                break;
+            case 3:
                  for (int i=0; i<4; i++)
                     {
                         printf("%c\n", ID[i]);
                     }
                 fila_printAllInfo(comum);
                 fila_printAllInfo(emergencia);
-                break;
-            case 3:
+                fila_printAllInfo(realizados);
                 break;
             case 4:
                 break;
@@ -94,7 +111,7 @@ int main()
     } while (sel != -1);
     fila_liberar(comum);
     fila_liberar(emergencia);
-    //fila_liberar(realizados);
+    fila_liberar(realizados);
     return 0;
 }
 

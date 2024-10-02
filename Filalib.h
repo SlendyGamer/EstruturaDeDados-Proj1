@@ -35,7 +35,8 @@ data setHorarioAtual()
     data horarioAtual;
     int minutos = rand()%1440;
 
-    horarioAtual.horas = floor(minutos/60);
+    horarioAtual.dias = 0;
+    horarioAtual.horas = (int) (minutos/60);
     horarioAtual.minutos = minutos % 60;
 
     return horarioAtual;
@@ -55,6 +56,8 @@ int setPassageiros()
 data setHoraPrevista(data horaAtual)
 {
     data horaPrevista;
+
+    horaPrevista.dias = 0;
     horaPrevista.minutos = (horaAtual.minutos -30 + rand() % 61);
     horaPrevista.horas = horaAtual.horas;
 
@@ -82,8 +85,41 @@ data setHoraPrevista(data horaAtual)
     return horaPrevista;
 }
 
+int estaAtrasado(data horaAtual, data horaPrevista)
+{
+    double horaAtualConvertida = (horaAtual.dias * 1440) + (horaAtual.horas * 60) + (horaAtual.minutos); //transforma para tempo equivalente em horas
+    double horaPrevistaConvertida = (horaPrevista.dias * 1440) + (horaPrevista.horas * 60) + (horaPrevista.minutos); //transforma para tempo equivalente em horas
+    printf("%.0f\n", horaAtualConvertida);
+    printf("%.0f\n", horaPrevistaConvertida);
+    if ((horaPrevistaConvertida + 15) >= horaAtualConvertida) //adiciona 15 minutos de tolerancia e se esta dentro do horario, nao esta atrasado
+    {
+        printf("pontual");  //apagar
+        return 1;
+    }
+    printf("atrasado");  //apagar
+    return 0; //esta atrasado
+}
 
+void printMenu()
+{
+        printf("\n\n\t\tTorre de Controle LucI airport"
 
+        "\n\nEscolha uma das opções abaixo:"
+
+               "\n\n\t1- Registrar nova requisição de pouso"
+
+               "\n\n\t2- Autorizar próximo avião"
+
+               "\n\n\t3- Observar filas atuais"
+
+               "\n\n\t4- Indicar próximo a pousar"
+
+               "\n\n\t5- Observar pousos já realizados"
+
+               "\n\n\t6- Estimar pousos que ainda serão feitos"
+
+        "\n\nDigite '-1' para sair ");
+}
 
 
 fila* fila_criar()
@@ -107,14 +143,13 @@ int fila_vazia(fila *f)
 
 
 
-
-no* inserirVoo(no *ult_pos, char ID[], int pass, int stts) // data hora_prev
+no* inserirVoo(no *ult_pos, voo infoVoo) // data hora_prev
 {
     no *no_aux = (no*) malloc(sizeof(no));
-    strcpy(no_aux->info.ID, ID);
-    no_aux->info.passageiros = pass;
-    no_aux->info.status = stts;
-    //no_aux->info.hora_prevista = hora_prev;
+    strcpy(no_aux->info.ID, infoVoo.ID);
+    no_aux->info.passageiros = infoVoo.passageiros;
+    no_aux->info.status = infoVoo.status;
+    no_aux->info.hora_prevista = infoVoo.hora_prevista;
     no_aux->prox = NULL;
 
     if (ult_pos != NULL)
@@ -123,15 +158,15 @@ no* inserirVoo(no *ult_pos, char ID[], int pass, int stts) // data hora_prev
     return no_aux;
 }
 
-void fila_inserirVoo(fila *f, char ID[], int pass, int stts) //data hora_prev
+void fila_inserirVoo(fila *f, voo infoVoo) //data hora_prev
 {
-    f->last = inserirVoo(f->last, ID, pass, stts); //data hora_prev
+    f->last = inserirVoo(f->last, infoVoo); //data hora_prev
 
     if (f->first == NULL)
         f->first = f->last;
 }
 
-
+/*
 no* inserir(no *ult_pos, int novo_valor) //apagar
 {
     no *no_aux = (no*) malloc(sizeof(no));
@@ -157,8 +192,31 @@ no* retirar(no *pri_pos)
     no *no_aux = pri_pos->prox;
     free(pri_pos);
     return no_aux;
+} */
+
+no* retirarVoo(no *pri_pos)
+{
+    no *no_aux = pri_pos->prox;
+    free(pri_pos);
+    return no_aux;
 }
 
+voo fila_retirarVoo(fila *f)
+{
+    voo v;
+    if (fila_vazia(f))
+    {
+        printf("\nFila vazia!\n");
+        exit(0);
+    }
+    v = f->first->info;
+    f->first = retirarVoo(f->first);
+    if (f->first == NULL)
+        f->last = NULL;
+    return v;
+}
+
+/*
 int fila_retirar(fila *f)
 {
     int v;
@@ -172,7 +230,7 @@ int fila_retirar(fila *f)
     if (f->first == NULL)
         f->last = NULL;
     return v;
-}
+} */
 
 void fila_printAllInfo(fila *f)
 {
@@ -186,6 +244,19 @@ void fila_printAllInfo(fila *f)
         printf("hora prevista:\t%d\n", pos->info.hora_prevista);
     }
     printf("\n\n");
+}
+
+void fila_printNextInfo(fila *f)
+{
+    no* pos = f->first;
+    printf("\n\n");
+    if (pos != NULL)
+    {
+        printf("ID:\t%.*s\n", 4, pos->info.ID);
+        printf("Num pass:\t%d\n", pos->info.passageiros);
+        printf("Status:\t %d\n", pos->info.status);
+        printf("hora prevista:\t%d\n", pos->info.hora_prevista);
+    }
 }
 
 void fila_printAll(fila *f)
