@@ -15,7 +15,7 @@ int main()
     srand(SEED);
 
     int passageiros;
-    int sel = 0;
+    int sel;
     char ID[6] = {0};
     char whichFila;
     data horarioAtual = setHorarioAtual();
@@ -31,12 +31,14 @@ int main()
     }
     do
     {
+        system("cls");
         printf("\n\n\t\tTorre de Controle LucI airport\n\n");
         printf("\thorario atual: ");
         showHorario(horarioAtual);
         printMenu();
         scanf("%d", &sel);
         fflush(stdin);
+        system("cls");
         switch(sel)
         {
             case 1:
@@ -47,71 +49,95 @@ int main()
                     {
                         ID[i] = getchar();
                     }
-                    fflush(stdin);
+                    fflush(stdin);  //apagar?
                 } while (!IDvalido(ID)); // || procura por id igual nas filas   || fila_duplicata(comum, ID) || fila_duplicata(emergencia, ID)
-
-                strcpy(novoVoo.ID, ID);
+                strcpy(novoVoo.ID, strupr(ID));
                 novoVoo.passageiros = setPassageiros();
                 novoVoo.hora_prevista = setHoraPrevista(horarioAtual);
-                printf("voo %.*s\n"
-                       "passageiros: %d\n"
-                       "hora_prevista: ", 4, novoVoo.ID, novoVoo.passageiros);
-                       showHorario(novoVoo.hora_prevista);
-                printf("status: ");
+                printf("voo %.*s inserido com sucesso na espera ", 4, novoVoo.ID);
 
                 if (ID[4] == '!')
                 {
+                    printf("emergencial\n");
                    novoVoo.status = -1;
                    fila_inserirVoo(emergencia, novoVoo);
-                   printf("emergencia");
                 }
                 else
                 {
+                    printf("comum\n");
+                    printf("Status do Voo: ");
                     if (estaAtrasado(horarioAtual, novoVoo.hora_prevista))
                     {
                         novoVoo.status = 0;
-                        fila_inserirVoo(comum, novoVoo);
-                        printf("no horario");
+                        printf("%d", novoVoo.status);
                     }
                     else
                     {
                         novoVoo.status = 1;
-                        fila_inserirVoo(comum, novoVoo);
-                        printf("atrasado");
                     }
+                    showStatus(novoVoo.status);
+                    fila_inserirVoo(comum, novoVoo);
                 }
+                system("pause");
                 break;
             case 2:
                 if (!fila_vazia(emergencia))
                 {
+                    printf("Voo emergencial liberado:\n");
                     fila_printNextInfo(emergencia);
                     fila_inserirVoo(realizados, fila_retirarVoo(emergencia));
                 }
-                else
+                else if (!fila_vazia(comum))
                 {
+                    printf("Voo comum liberado:\n");
                     fila_printNextInfo(comum);
                     fila_inserirVoo(realizados, fila_retirarVoo(comum));
                 }
+                else
+                {
+                    printf("Filas vazias!\n");
+                }
+                printf("horario de liberação: ");
+                    showHorario(horarioAtual);
                 horarioAtual = addHora(horarioAtual, 10);
+                system("pause");
                 break;
             case 3:
-
                 do
                 {
+                    printf("Que fila deseja visualizar?\n");
+                    printf("C - Comum\n");
+                    printf("E - Emergencial\n");
                 scanf("%c", &whichFila);
+                fflush(stdin);
                 whichFila = toupper(whichFila);
                 } while(whichFila != 'C' && whichFila != 'E');
                 switch(whichFila)
                 {
                 case 'C':
-                    fila_printAllInfo(comum);
+                    if (!fila_vazia(comum))
+                    {
+                        fila_printAllInfo(comum, 1);
+                    }
+                    else
+                    {
+                        printf("Fila comum vazia!\n");
+                    }
                     break;
                 case 'E':
-                    fila_printAllInfo(emergencia);
+                    if (!fila_vazia(emergencia))
+                    {
+                        fila_printAllInfo(emergencia, 1);
+                    }
+                    else
+                    {
+                        printf("Fila emergencial vazia!\n");
+                    }
                     break;
                 default:
                     break;
                 }
+                system("pause");
                 break;
             case 4:
                 if (!fila_vazia(emergencia))
@@ -126,27 +152,29 @@ int main()
                 {
                     printf("todas as filas estão vazias!\n");
                 }
+                system("pause");
                 break;
             case 5:
                 if (!fila_vazia(realizados))
                 {
-                    fila_printAllInfo(realizados);
+                    fila_printAllInfo(realizados, 0);
                 }
                 else
                 {
-                    printf("nenhum pouso ocorreu");
+                    printf("Nenhum pouso realizado ainda!\n");
                 }
+                system("pause");
                 break;
             case 6:
                 break;
-            case -1:
+            case 0:
                 break;
             default:
                 system("cls");
                 printf("\nErro de Input\n\n");
                 system("pause");
         }
-    } while (sel != -1);
+    } while (sel != 0);
     fila_liberar(comum);
     fila_liberar(emergencia);
     fila_liberar(realizados);

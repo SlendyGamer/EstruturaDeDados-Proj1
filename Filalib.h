@@ -121,14 +121,10 @@ int estaAtrasado(data horaAtual, data horaPrevista)
 {
     double horaAtualConvertida = (horaAtual.dias * 1440) + (horaAtual.horas * 60) + (horaAtual.minutos); //transforma para tempo equivalente em horas
     double horaPrevistaConvertida = (horaPrevista.dias * 1440) + (horaPrevista.horas * 60) + (horaPrevista.minutos); //transforma para tempo equivalente em horas
-    printf("%.0f\n", horaAtualConvertida);
-    printf("%.0f\n", horaPrevistaConvertida);
     if ((horaPrevistaConvertida + 15) >= horaAtualConvertida) //adiciona 15 minutos de tolerancia e se esta dentro do horario, nao esta atrasado
     {
-        printf("pontual");  //apagar
         return 1;
     }
-    printf("atrasado");  //apagar
     return 0; //esta atrasado
 }
 
@@ -148,7 +144,7 @@ void printMenu()
 
                "\n\n\t6- Estimar pousos que ainda serão feitos"
 
-        "\n\nDigite '-1' para sair ");
+        "\n\nDigite '0' para sair ");
 }
 
 
@@ -262,7 +258,24 @@ int fila_retirar(fila *f)
     return v;
 } */
 
-void fila_printAllInfo(fila *f)
+void showStatus(int n)
+{
+    if (n == 0)
+    {
+        printf("sem atraso\n");
+    }
+    else if (n == 1)
+    {
+        printf("atrasado\n");
+    }
+    else
+    {
+        printf("emergência\n");
+    }
+
+}
+
+void fila_printAllInfo(fila *f, int hideStatus)
 {
     no* pos;
     printf("\n\n");
@@ -270,8 +283,13 @@ void fila_printAllInfo(fila *f)
     {
         printf("ID:\t%.*s\n", 4, pos->info.ID);
         printf("Num pass:\t%d\n", pos->info.passageiros);
-        printf("Status:\t %d\n", pos->info.status);
-        printf("hora prevista:\t%d : %d\n", pos->info.hora_prevista.horas, pos->info.hora_prevista.minutos);
+        if (hideStatus == 0)
+        {
+            printf("Status:\t");
+                showStatus(pos->info.status);              //nunca vai querer saber o status??
+        }
+        printf("hora prevista:\t");
+            showHorario(pos->info.hora_prevista);
     }
     printf("\n\n");
 }
@@ -279,13 +297,14 @@ void fila_printAllInfo(fila *f)
 void fila_printNextInfo(fila *f)
 {
     no* pos = f->first;
-    printf("\n\n");
     if (pos != NULL)
     {
-        printf("ID:\t%.*s\n", 4, pos->info.ID);
-        printf("Num pass:\t%d\n", pos->info.passageiros);
-        printf("Status:\t %d\n", pos->info.status);
-        printf("hora prevista:\t%d : %d\n", pos->info.hora_prevista.horas, pos->info.hora_prevista.minutos);
+        printf("\tVoo %.*s\n", 4, pos->info.ID);
+        printf("\t%d passageiros\n", pos->info.passageiros);
+        printf("\tHora prevista: ");
+            showHorario(pos->info.hora_prevista);
+        printf("\tStatus: ");
+            showStatus(pos->info.status);
     }
 }
 
