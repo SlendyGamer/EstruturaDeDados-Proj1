@@ -33,18 +33,37 @@ typedef struct fila
 data setHorarioAtual()
 {
     data horarioAtual;
-    int minutos = rand()%1440;
+    int minutos = rand()%1440;         //1440 minutos representa 24h
 
     horarioAtual.dias = 0;
-    horarioAtual.horas = (int) (minutos/60);
-    horarioAtual.minutos = minutos % 60;
+    horarioAtual.horas = (int) (minutos/60);      //converte tempo em minutos para horas
+    horarioAtual.minutos = minutos % 60;          //o resto são os minutos
 
     return horarioAtual;
 }
 
 void showHorario(data horario)
 {
-    printf("%02d : %02d\n", horario.horas, horario.minutos);
+    printf("%02d : %02d\n", horario.horas, horario.minutos);   //printa horario recebido formatado
+}
+
+void printMenu()
+{
+        printf("\n\t\tO que deseja fazer?"
+
+               "\n\n\t1 - Registrar nova requisição de pouso"
+
+               "\n\n\t2 - Autorizar próxima aeronave"
+
+               "\n\n\t3 - Observar filas de aeronaves"
+
+               "\n\n\t4 - Indicar próxima aeronave que será liberada"
+
+               "\n\n\t5 - Aterrissagens já realizadas"
+
+               "\n\n\t6 - Simular futuras aterrissagens"
+
+        "\n\nDigite '0' para sair\n");
 }
 
 int setPassageiros()
@@ -119,34 +138,62 @@ data addHora(data horaAtual, int minutos)
 
 int estaAtrasado(data horaAtual, data horaPrevista)
 {
-    double horaAtualConvertida = (horaAtual.dias * 1440) + (horaAtual.horas * 60) + (horaAtual.minutos); //transforma para tempo equivalente em horas
-    double horaPrevistaConvertida = (horaPrevista.dias * 1440) + (horaPrevista.horas * 60) + (horaPrevista.minutos); //transforma para tempo equivalente em horas
+    long horaAtualConvertida = (horaAtual.dias * 1440) + (horaAtual.horas * 60) + (horaAtual.minutos); //transforma para tempo equivalente em horas
+    long horaPrevistaConvertida = (horaPrevista.dias * 1440) + (horaPrevista.horas * 60) + (horaPrevista.minutos);
     if ((horaPrevistaConvertida + 15) >= horaAtualConvertida) //adiciona 15 minutos de tolerancia e se esta dentro do horario, nao esta atrasado
     {
-        return 1;
+        return 0;
     }
-    return 0; //esta atrasado
+    return 1; //esta atrasado
 }
 
-void printMenu()
+void showStatus(int n)
 {
-        printf("\n\nEscolha uma das opções abaixo:"
+    if (n == 1)
+    {
+        printf("SEM ATRASO!\n\n");
+    }
+    else if (n == 0)
+    {
+        printf("ATRASADO!\n\n");
+    }
+    else
+    {
+        printf("EMERGÊNCIA!\n\n");
+    }
 
-               "\n\n\t1- Registrar nova requisição de pouso"
-
-               "\n\n\t2- Autorizar próximo avião"
-
-               "\n\n\t3- Observar filas atuais"
-
-               "\n\n\t4- Indicar próximo a pousar"
-
-               "\n\n\t5- Observar pousos já realizados"
-
-               "\n\n\t6- Estimar pousos que ainda serão feitos"
-
-        "\n\nDigite '0' para sair ");
 }
 
+void printInfo(no *n)
+{
+    printf("\n\tCÓDIGO DO VOO: %.*s\n", 4, n->info.ID);
+    printf("\tPASSAGEIROS À BORDO: %d\n", n->info.passageiros);
+    printf("\tTIPO DO VOO: ");
+    if (n->info.status == -1)
+        showStatus(n->info.status);              //nunca vai querer saber o status??
+    else
+        printf("COMUM!\n");
+}
+
+void printQuant(fila *c, fila *e, int q)
+{
+    no* auxC = c->first;
+    no* auxE = e->first;
+    int i = 0;
+    while (auxE != NULL && i<q)
+    {
+        printInfo(auxE);
+        auxE = auxE->prox;
+        i++;
+    }
+    while (auxC != NULL && i<q)
+    {
+        printInfo(auxC);
+        auxC = auxC->prox;
+        i++;
+    }
+    printf("\n");
+}
 
 fila* fila_criar()
 {
@@ -192,34 +239,6 @@ void fila_inserirVoo(fila *f, voo infoVoo) //data hora_prev
         f->first = f->last;
 }
 
-/*
-no* inserir(no *ult_pos, int novo_valor) //apagar
-{
-    no *no_aux = (no*) malloc(sizeof(no));
-    no_aux->valor = novo_valor;
-    no_aux->prox = NULL;
-
-    if (ult_pos != NULL)
-        ult_pos->prox = no_aux;
-
-    return no_aux;
-}
-
-void fila_inserir(fila *f, int v) //apagar
-{
-    f->last = inserir(f->last, v);
-
-    if (f->first == NULL)
-        f->first = f->last;
-}
-
-no* retirar(no *pri_pos)
-{
-    no *no_aux = pri_pos->prox;
-    free(pri_pos);
-    return no_aux;
-} */
-
 no* retirarVoo(no *pri_pos)
 {
     no *no_aux = pri_pos->prox;
@@ -242,69 +261,56 @@ voo fila_retirarVoo(fila *f)
     return v;
 }
 
-/*
-int fila_retirar(fila *f)
-{
-    int v;
-    if (fila_vazia(f))
-    {
-        printf("\nFila vazia!\n");
-        exit(0);
-    }
-    v = f->first->valor;
-    f->first = retirar(f->first);
-    if (f->first == NULL)
-        f->last = NULL;
-    return v;
-} */
-
-void showStatus(int n)
-{
-    if (n == 0)
-    {
-        printf("sem atraso\n");
-    }
-    else if (n == 1)
-    {
-        printf("atrasado\n");
-    }
-    else
-    {
-        printf("emergência\n");
-    }
-
-}
-
-void fila_printAllInfo(fila *f, int hideStatus)
+void fila_printAllInfo(fila *f, int printType)   //printType - 0 (oculta tipo do voo) - 1 (oculta status e mostra tipo) - 2 (oculta tipo e status)
 {
     no* pos;
-    printf("\n\n");
     for (pos=f->first; pos!=NULL; pos=pos->prox)
     {
-        printf("ID:\t%.*s\n", 4, pos->info.ID);
-        printf("Num pass:\t%d\n", pos->info.passageiros);
-        if (hideStatus == 0)
-        {
-            printf("Status:\t");
-                showStatus(pos->info.status);              //nunca vai querer saber o status??
-        }
-        printf("hora prevista:\t");
+        printf("\tCÓDIGO DO VOO: %.*s\n", 4, pos->info.ID);
+        printf("\tPASSAGEIROS À BORDO: %d\n", pos->info.passageiros);
+        printf("\tHORA DE CHEGADA PREVISTA: ");
             showHorario(pos->info.hora_prevista);
+        if (printType == 1)
+        {
+            printf("\tTIPO DO VOO: ");
+            if (pos->info.status == -1)
+                showStatus(pos->info.status);              //nunca vai querer saber o status??
+            else
+                printf("COMUM!\n");
+        }
+        else if (printType == 0)
+        {
+            printf("\tSTATUS: ");
+                showStatus(pos->info.status);
+        }
     }
-    printf("\n\n");
 }
 
-void fila_printNextInfo(fila *f)
+void fila_printNextInfo(fila *f, int printType)   //printType - 0 (oculta tipo do voo e mostra status) - 1 (oculta hora prevista, mostra tipo e oculta status) - 2 (oculta tipo e status)
 {
     no* pos = f->first;
     if (pos != NULL)
     {
-        printf("\tVoo %.*s\n", 4, pos->info.ID);
-        printf("\t%d passageiros\n", pos->info.passageiros);
-        printf("\tHora prevista: ");
-            showHorario(pos->info.hora_prevista);
-        printf("\tStatus: ");
+        printf("\tCÓDIGO DO VOO: %.*s\n", 4, pos->info.ID);
+        printf("\tPASSAGEIROS À BORDO: %d\n", pos->info.passageiros);
+        if (printType != 1)
+        {
+            printf("\tHORA DE CHEGADA PREVISTA: ");
+                showHorario(pos->info.hora_prevista);
+        }
+        if (printType != 0)
+        {
+            printf("\tTIPO DO VOO: ");
+            if (pos->info.status == -1)
+                showStatus(pos->info.status);              //nunca vai querer saber o status??
+            else
+                printf("COMUM!\n");
+        }
+        else
+        {
+            printf("\tSTATUS: ");
             showStatus(pos->info.status);
+        }
     }
 }
 
@@ -338,8 +344,11 @@ int fila_duplicata(fila *f, char ID[]) //correta?
     no *pos = f->first;
     while (pos != NULL)
     {
-        if (strncmp(pos->info.ID, ID, 4) != 0)   //strncmp compara os 4 primeiros digitos de ID e compara se existe algum ID igual na fila atual, se existir ele retorna 1
+        if (strncmp(pos->info.ID, ID, 4) == 0)   //strncmp compara os 4 primeiros digitos de ID e compara se existe algum ID igual na fila atual, se existir ele retorna 1
+        {
+            printf("\nERRO: Voo já registrado no sistema!\n");
             return 1;
+        }
         pos = pos->prox;
     }
     return 0;
