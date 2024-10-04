@@ -156,10 +156,12 @@ int main()
             case 4:
                 if (!fila_vazia(emergencia))
                 {
+                    printf("\tPRÓXIMA AERONAVE A SER LIBERADA:\n\n");
                     fila_printNextInfo(emergencia, 1);
                 }
                 else if (!fila_vazia(comum))
                 {
+                    printf("\tPRÓXIMA AERONAVE A SER LIBERADA:\n\n");
                     fila_printNextInfo(comum, 1);
                 }
                 else

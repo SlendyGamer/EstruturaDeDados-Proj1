@@ -283,6 +283,7 @@ void fila_printAllInfo(fila *f, int printType)   //printType - 0 (oculta tipo do
             printf("\tSTATUS: ");
                 showStatus(pos->info.status);
         }
+        printf("\n");
     }
 }
 
@@ -314,16 +315,7 @@ void fila_printNextInfo(fila *f, int printType)   //printType - 0 (oculta tipo d
     }
 }
 
-void fila_printAll(fila *f)
-{
-    no* pos;
-    printf("\n\n");
-    for (pos=f->first; pos!=NULL; pos=pos->prox)
-    {
-        printf("%d - ", pos->valor);
-    }
-    printf("\n\n");
-}
+
 
 fila* fila_liberar(fila *f)
 {
@@ -344,7 +336,7 @@ int fila_duplicata(fila *f, char ID[]) //correta?
     no *pos = f->first;
     while (pos != NULL)
     {
-        if (strncmp(pos->info.ID, ID, 4) == 0)   //strncmp compara os 4 primeiros digitos de ID e compara se existe algum ID igual na fila atual, se existir ele retorna 1
+        if (strncmp(pos->info.ID, strupr(ID), 4) == 0)   //strncmp compara os 4 primeiros digitos de ID e compara se existe algum ID igual na fila atual, se existir ele retorna 1
         {
             printf("\nERRO: Voo já registrado no sistema!\n");
             return 1;
