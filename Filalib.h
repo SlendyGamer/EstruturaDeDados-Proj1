@@ -210,13 +210,13 @@ void showStatus(int n)
 
 void printInfo(no *n)
 {
-    printf("\n\tCÓDIGO DO VOO: %.*s\n", 4, n->info.ID);
+    printf("\tCÓDIGO DO VOO: %.*s\n", 4, n->info.ID);
     printf("\tPASSAGEIROS À BORDO: %d\n", n->info.passageiros);
     printf("\tTIPO DO VOO: ");
     if (n->info.status == -1)
         showStatus(n->info.status);
     else
-        printf(BLUE "COMUM!\n" CRESET);
+        printf(BLUE "COMUM!\n\n" CRESET);
 }
 
 void printQuant(fila *c, fila *e, int q)
@@ -236,7 +236,7 @@ void printQuant(fila *c, fila *e, int q)
         auxC = auxC->prox;  //printa fila comum, se houver
         i++;
     }
-    printf("\n");
+    //printf("\n");
 }
 
 fila* fila_criar()

@@ -36,7 +36,7 @@ int main()
         printf("\n\thorario atual: "); showHorario(horarioAtual);       //mostra o horario atual
         printf("\n\n\tTorre de Controle Luc.I airport\n\n");
         printMenu();                                                    //printa o menu de seleção principal
-        printf(CYAN "\n/: ");
+        printf(CYAN "\n     /: ");
         scanf("%d", &sel);
         printf(CRESET);
         fflush(stdin);
@@ -48,7 +48,7 @@ int main()
                 {
                     printf("\tDIGITE O CÓDIGO DO VOO(4 CARACTERES ALFANUMÉRICOS)\n"
                            YELLOW "\tEM CASO DE EMERGÊNCIA, INSIRA '!' NO FINAL:\n" CRESET);
-                           printf(CYAN "\n/: ");
+                           printf(CYAN "\n     /: ");
                     for (int i=0; i<5; i++)
                     {
                         ID[i] = getchar();                              //le os proximos 5 caracteres digitados
@@ -121,7 +121,7 @@ int main()
                     printf("\tQue fila deseja visualizar?\n");
                     printf("\tC - Comum\n");
                     printf("\tE - Emergencial\n");
-                    printf(CYAN "\n/: ");
+                    printf(CYAN "\n     /: ");
                 scanf("%c", &whichFila);
                 printf(CRESET);
                 fflush(stdin);
@@ -208,8 +208,7 @@ int main()
                     {
                         time = 0;
                         printf("\tDIGITE O TEMPO(MINUTOS) PARA A SIMULAÇÃO DE POUSO\n\n");
-                        printf(CYAN);
-                        printf("\n/: ");
+                        printf(CYAN "\n     /: ");
                         scanf("%d", &time);
                         printf(CRESET);
                         fflush(stdin);
@@ -223,9 +222,9 @@ int main()
                             system("cls");
                         }
                     } while (time <= 0);
-                        printf("\n\tVOOS LIBERADOS EM %d MINUTOS:\n", time);        //se tempo for maior que 0, printa pelo menos um voo que sera liberado "imediatamente" e mais 1 para cada 10 min
+                        printf("\n\tVOOS LIBERADOS EM %d MINUTOS:\n\n", time);        //se tempo for maior que 0, printa pelo menos um voo que sera liberado "imediatamente" e mais 1 para cada 10 min
                         time /= (int) 10;
-                        time++;
+                        //time++;
                         printQuant(comum, emergencia, time);
                 }
                 printf(MAGENTA);
@@ -233,7 +232,7 @@ int main()
                 printf(CRESET);
                 break;
             case 0:
-                printf(YELLOW "\nSaindo" CRESET);
+                printf(YELLOW "\n\tSaindo" CRESET);
                 break;
             default:
                 system("cls");
