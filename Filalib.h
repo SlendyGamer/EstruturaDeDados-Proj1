@@ -1,17 +1,62 @@
 #ifndef FILAS_H_INCLUDED
 #define FILAS_H_INCLUDED
+#define RED     "\x1b[31m"
+#define GREEN   "\x1b[32m"
+#define YELLOW  "\x1b[33m"
+#define BLUE    "\x1b[34m"
+#define MAGENTA "\x1b[35m"
+#define CYAN    "\x1b[36m"
+#define CRESET   "\x1b[0m"
 #define SEED 23698
+
+/*
+    Os defines são os códigos ANSI para as respectivas cores listadas e CRESET restaura a cor para a padrão do terminal do dispositivo.
+    exemplo de uso: printf(RED "texto vermelho" CRESET);
+    A seed serve para semear as funções randomicas e permite uma aleaoriedade "controlada".
+
+    FUNÇÕES DE FILA:
+- fila fila_criar(): RETORNA NOVA FILA
+- int fila_vazia(fila): RETORNA 1 SE ESTIVER VAZIA, SE NÃO, RETORNA 0
+- void fila_inserirVoo(fila, voo): INSERE INFORMAÇÕES DO VOO NA ÚLTIMA POSIÇÃO DA FILA
+- voo fila_retirarVoo(fila): RETIRA E RETORNA INFORMAÇÕES DO VOO DA PRIMEIRA POSIÇÃO DA FILA
+- void fila_printAllInfo(fila, int): PRINTA INFORMAÇÃO DE TODOS OS VOOS COM LAYOUT DEFINIDO PELO INT:
+                                    0 - (oculta tipo do voo)
+                                    1 - (oculta status e mostra tipo)
+                                    2 - (oculta tipo e status)
+- void fila_printNextInfo(fila, int): PRINTA INFORMAÇÃO DE TODOS OS VOOS COM LAYOUT DEFINIDO PELO INT:
+                                    0 - (oculta tipo do voo e mostra status)
+                                    1 - (oculta hora prevista, mostra tipo e oculta status)
+                                    2 - (oculta tipo e status)
+- int fila_duplicata(fila, char[]): RETORNA 1 SE ENCONTRAR VOO COM ID IGUAL NA FILA PASSADA, SE NÃO, RETORNA 0
+- fila_liberar(fila): LIBERA A FILA PASSADA POR COMPLETO
+
+    FUNÇÕES DE USO INTERNO:
+- no inserirVoo(no, voo): CHAMADO POR fila_inserirVoo PARA REALIZAR A INSERÇÃO DOS DADOS NA ÚLTIMA POSIÇÃO DA FILA
+- no retirarVoo(no): CHAMADO POR fila_retiraVoo PARA REALIZAR A REMOÇÃO DOS DADOS NA PRIMEIRA POSIÇÃO DA FILA
+
+    FUNÇÕES DE USO GERAL:
+- data setHorarioAtual(): GERA UM HORARIO VÁLIDO ALEATÓRIO
+- void showHorario(data): RETORNA UMS STRING FORMATADA CONTENDO O HORÁRIO
+- void printMenu(): PRINTA O MENU PRINCIPAL DE SELEÇÃO
+- int setPassageiros(): DEFINE ALEATORIAMENTE OS PASSAGEIROS ENTRE 50|-|200
+- data setHoraPrevista(data): DEFINE A HORA PREVISTA DE UM VOO ALEATORIAMENTE, MAS PRÓXIMA DO HORARIO ATUAL
+- data addHora(data, int): SOMA UMA QUANTIDADE DE MINUTOS A HORA ATUAL E A FORMATA NOVAMENTE, SE NECESSÁRIO
+- int estaAtrasado(data, data): TRANSFORMA AS DATAS EM MINUTOS E COMPARA AS DUAS PARA VER SE VOO ESTA ATRASADO OU NO HORÁRIO. RETORNA 1 PARA VOO ATRASADO, SE NÃO, RETORNA 0
+- void showStatus (int): PRINTA UM TEXTO RESPECTIVO AO VALOR DO STATUS
+- void printInfo(no): PRINTA A INFORMAÇÃO DO NO PASSADO
+- void printQuant(fila, fila, int): PRINTA UM NUMERO ESPECÍFICO DE INFORMAÇÕES NA ORDEM QUE OCORRERIA CASO VOOS FOSSEM LIBERADOS
+*/
 
 typedef struct horario
 {
-    int dias;  //para separar horarios de dias diferentes 0 - ??
-    int horas; //0 - 23
-    int minutos; //0 - 59
+    int dias;  //para separar horarios de dias diferentes 0 |- ??
+    int horas; //0 |- 23
+    int minutos; //0 |- 59
 }data;
 
 typedef struct voo
 {
-    char ID[5];    //id 4 caracteres alfanum e ! ou nao(emergencial)
+    char ID[5];    //id 4 caracteres alfanum e !(emergencial) ou não
     int passageiros; //num passageiros
     int status;   //0 atrasado, 1 on time, -1 emergencia
     data hora_prevista;
@@ -19,15 +64,14 @@ typedef struct voo
 
 typedef struct no
 {
-    voo info;
-    int valor;
-    struct no *prox;
+    voo info;   //contem informações do voo
+    struct no *prox;    //proximo elemento da fila
 } no;
 
 typedef struct fila
 {
-    no *first;
-    no *last;
+    no *first;  //primeiro elemento da fila
+    no *last;   //ultimo elemento da fila
 }fila;
 
 data setHorarioAtual()
@@ -44,10 +88,10 @@ data setHorarioAtual()
 
 void showHorario(data horario)
 {
-    printf("%02d : %02d\n", horario.horas, horario.minutos);   //printa horario recebido formatado
+    printf("%02d : %02d\n", horario.horas, horario.minutos);   //printa horario recebido, formatado
 }
 
-void printMenu()
+void printMenu()    //printa menu principal
 {
         printf("\n\t\tO que deseja fazer?"
 
@@ -63,12 +107,12 @@ void printMenu()
 
                "\n\n\t6 - Simular futuras aterrissagens"
 
-        "\n\nDigite '0' para sair\n");
+        YELLOW "\n\n\tDigite '0' para sair\n" CRESET);
 }
 
 int setPassageiros()
 {
-    int passageiros = 50 + rand() % 151;
+    int passageiros = 50 + rand() % 151; //define valor de 50|-|200
     return passageiros;
 }
 
@@ -77,13 +121,13 @@ data setHoraPrevista(data horaAtual)
     data horaPrevista;
 
     horaPrevista.dias = 0;
-    horaPrevista.minutos = (horaAtual.minutos -30 + rand() % 61);
+    horaPrevista.minutos = (horaAtual.minutos -30 + rand() % 61); //atribui um valor de -30 min até +30min no horario atual
     horaPrevista.horas = horaAtual.horas;
 
     if (horaPrevista.minutos >=60)
     {
         horaPrevista.horas++;
-        horaPrevista.minutos -= 60;
+        horaPrevista.minutos -= 60; //reformata valor, caso esteja em formato invalido
         if(horaPrevista.horas > 23)
         {
             horaPrevista.dias++;
@@ -93,7 +137,7 @@ data setHoraPrevista(data horaAtual)
     else if (horaPrevista.minutos < 0)
     {
         horaPrevista.horas--;
-        horaPrevista.minutos += 60;
+        horaPrevista.minutos += 60; //reformata valor, caso esteja em formato invalido
         if(horaPrevista.horas < 0)
         {
             horaPrevista.dias--;
@@ -109,13 +153,13 @@ data addHora(data horaAtual, int minutos)
     data horaPrevista;
 
     horaPrevista.dias = 0;
-    horaPrevista.minutos = (horaAtual.minutos + minutos);
+    horaPrevista.minutos = (horaAtual.minutos + minutos);   //soma o valor passado em minutos
     horaPrevista.horas = horaAtual.horas;
 
     if (horaPrevista.minutos >=60)
     {
         horaPrevista.horas++;
-        horaPrevista.minutos -= 60;
+        horaPrevista.minutos -= 60; //reformata valor, caso esteja em formato invalido
         if(horaPrevista.horas > 23)
         {
             horaPrevista.dias++;
@@ -125,7 +169,7 @@ data addHora(data horaAtual, int minutos)
     else if (horaPrevista.minutos < 0)
     {
         horaPrevista.horas--;
-        horaPrevista.minutos += 60;
+        horaPrevista.minutos += 60; //reformata valor, caso esteja em formato invalido
         if(horaPrevista.horas < 0)
         {
             horaPrevista.dias--;
@@ -138,7 +182,7 @@ data addHora(data horaAtual, int minutos)
 
 int estaAtrasado(data horaAtual, data horaPrevista)
 {
-    long horaAtualConvertida = (horaAtual.dias * 1440) + (horaAtual.horas * 60) + (horaAtual.minutos); //transforma para tempo equivalente em horas
+    long horaAtualConvertida = (horaAtual.dias * 1440) + (horaAtual.horas * 60) + (horaAtual.minutos); //transforma para tempo equivalente em minutos
     long horaPrevistaConvertida = (horaPrevista.dias * 1440) + (horaPrevista.horas * 60) + (horaPrevista.minutos);
     if ((horaPrevistaConvertida + 15) >= horaAtualConvertida) //adiciona 15 minutos de tolerancia e se esta dentro do horario, nao esta atrasado
     {
@@ -151,15 +195,15 @@ void showStatus(int n)
 {
     if (n == 1)
     {
-        printf("SEM ATRASO!\n\n");
+        printf(GREEN "SEM ATRASO!\n\n" CRESET);
     }
     else if (n == 0)
     {
-        printf("ATRASADO!\n\n");
+        printf(YELLOW "ATRASADO!\n\n" CRESET);
     }
     else
     {
-        printf("EMERGÊNCIA!\n\n");
+        printf(RED "EMERGÊNCIA!\n\n" CRESET);
     }
 
 }
@@ -170,9 +214,9 @@ void printInfo(no *n)
     printf("\tPASSAGEIROS À BORDO: %d\n", n->info.passageiros);
     printf("\tTIPO DO VOO: ");
     if (n->info.status == -1)
-        showStatus(n->info.status);              //nunca vai querer saber o status??
+        showStatus(n->info.status);
     else
-        printf("COMUM!\n");
+        printf(BLUE "COMUM!\n" CRESET);
 }
 
 void printQuant(fila *c, fila *e, int q)
@@ -183,13 +227,13 @@ void printQuant(fila *c, fila *e, int q)
     while (auxE != NULL && i<q)
     {
         printInfo(auxE);
-        auxE = auxE->prox;
+        auxE = auxE->prox;  //printa fila emergencial, se houver
         i++;
     }
     while (auxC != NULL && i<q)
     {
         printInfo(auxC);
-        auxC = auxC->prox;
+        auxC = auxC->prox;  //printa fila comum, se houver
         i++;
     }
     printf("\n");
@@ -197,7 +241,7 @@ void printQuant(fila *c, fila *e, int q)
 
 fila* fila_criar()
 {
-    fila* nova_fila = (fila*) malloc(sizeof(fila));
+    fila* nova_fila = (fila*) malloc(sizeof(fila)); //aloca fila
     nova_fila->first = NULL;
     nova_fila->last = NULL;
     return nova_fila;
@@ -205,10 +249,10 @@ fila* fila_criar()
 
 int fila_vazia(fila *f)
 {
-    if (f->first == NULL)
+    if (f->first == NULL)   //checa se fila é vazia
         return 1;
 
-    return 0;                  //funciona?
+    return 0;
 }
 
 
@@ -216,13 +260,13 @@ int fila_vazia(fila *f)
 
 
 
-no* inserirVoo(no *ult_pos, voo infoVoo) // data hora_prev
+no* inserirVoo(no *ult_pos, voo infoVoo) //função interna
 {
     no *no_aux = (no*) malloc(sizeof(no));
     strcpy(no_aux->info.ID, infoVoo.ID);
     no_aux->info.passageiros = infoVoo.passageiros;
     no_aux->info.status = infoVoo.status;
-    no_aux->info.hora_prevista = infoVoo.hora_prevista;
+    no_aux->info.hora_prevista = infoVoo.hora_prevista; //insere voo na fila
     no_aux->prox = NULL;
 
     if (ult_pos != NULL)
@@ -231,17 +275,17 @@ no* inserirVoo(no *ult_pos, voo infoVoo) // data hora_prev
     return no_aux;
 }
 
-void fila_inserirVoo(fila *f, voo infoVoo) //data hora_prev
+void fila_inserirVoo(fila *f, voo infoVoo)
 {
-    f->last = inserirVoo(f->last, infoVoo); //data hora_prev
+    f->last = inserirVoo(f->last, infoVoo); //insere voo na fila
 
     if (f->first == NULL)
         f->first = f->last;
 }
 
-no* retirarVoo(no *pri_pos)
+no* retirarVoo(no *pri_pos) //função interna
 {
-    no *no_aux = pri_pos->prox;
+    no *no_aux = pri_pos->prox; //remove voo da fila
     free(pri_pos);
     return no_aux;
 }
@@ -255,7 +299,7 @@ voo fila_retirarVoo(fila *f)
         exit(0);
     }
     v = f->first->info;
-    f->first = retirarVoo(f->first);
+    f->first = retirarVoo(f->first); //remove voo da fila
     if (f->first == NULL)
         f->last = NULL;
     return v;
@@ -274,9 +318,9 @@ void fila_printAllInfo(fila *f, int printType)   //printType - 0 (oculta tipo do
         {
             printf("\tTIPO DO VOO: ");
             if (pos->info.status == -1)
-                showStatus(pos->info.status);              //nunca vai querer saber o status??
+                showStatus(pos->info.status);
             else
-                printf("COMUM!\n");
+                printf(BLUE "COMUM!\n" CRESET);
         }
         else if (printType == 0)
         {
@@ -303,9 +347,9 @@ void fila_printNextInfo(fila *f, int printType)   //printType - 0 (oculta tipo d
         {
             printf("\tTIPO DO VOO: ");
             if (pos->info.status == -1)
-                showStatus(pos->info.status);              //nunca vai querer saber o status??
+                showStatus(pos->info.status);
             else
-                printf("COMUM!\n");
+                printf(BLUE "COMUM!\n\n" CRESET);
         }
         else
         {
@@ -315,34 +359,32 @@ void fila_printNextInfo(fila *f, int printType)   //printType - 0 (oculta tipo d
     }
 }
 
-
-
-fila* fila_liberar(fila *f)
-{
-    no* elemento = f->first;
-    while (elemento != NULL)
-    {
-        no* aux = elemento->prox;
-        free(elemento);
-        elemento = aux;
-    }
-    free(f);
-    printf("\nfila liberada\n");
-    return NULL;
-}
-
-int fila_duplicata(fila *f, char ID[]) //correta?
+int fila_duplicata(fila *f, char ID[])
 {
     no *pos = f->first;
     while (pos != NULL)
     {
         if (strncmp(pos->info.ID, strupr(ID), 4) == 0)   //strncmp compara os 4 primeiros digitos de ID e compara se existe algum ID igual na fila atual, se existir ele retorna 1
         {
-            printf("\nERRO: Voo já registrado no sistema!\n");
+            printf(RED "\n\tERRO: Voo já registrado no sistema!\n\n" CRESET);
             return 1;
         }
         pos = pos->prox;
     }
     return 0;
+}
+
+fila* fila_liberar(fila *f)
+{
+    no* elemento = f->first;
+    while (elemento != NULL)
+    {
+        no* aux = elemento->prox;   //libera a fila inteira
+        free(elemento);
+        elemento = aux;
+    }
+    free(f);
+    printf(YELLOW "." CRESET);     // printa '.' para checar se foi liberada
+    return NULL;
 }
 #endif // FILAS_H_INCLUDED
